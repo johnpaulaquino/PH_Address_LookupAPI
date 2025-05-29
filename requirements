@@ -1,2 +1,7 @@
 openpyxl
 pandas
+SQLAlchemy
+fastapi[standard]
+pydantic-settings
+asyncpg
+python-dotenv
