@@ -10,8 +10,7 @@ settings = Settings()
     - This engine contains the url for db_services, to make a connection in db
 '''
 engine = create_async_engine(
-    settings.DB_URL,
-    echo = True
+    settings.DB_URL
 )
 
 # Create a session factory

@@ -2,3 +2,5 @@
 .venv
 .vscode
 /__pycache__
+alembic.ini
+/migration/versions
