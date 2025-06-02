@@ -1,22 +1,31 @@
 #import the base model
 from ph_address_api.database.models.base import  Base
 from sqlalchemy import String, Column, Integer
+from sqlalchemy.orm import relationship
+
 
 class Regions(Base):
     __tablename__  = 'regions'
 
     id : str = Column('id', String, primary_key=True, index=True)
-    name : str = Column('name',String, nullable=True, index=True)
+    region_name : str = Column('region_name',String, nullable=True, index=True)
+    region_code : str = Column('region_code',String, nullable=True, index=True)
     population : int = Column('population', Integer)
     island_groups: str = Column('island_groups', String, nullable=True)
 
-    def __init__(self, id = '', name = '',
+    prov  = relationship('Province', back_populates='region',lazy='dynamic')
+    cities  = relationship('City', back_populates='region',lazy='dynamic')
+
+    def __init__(self, id = '',
+                 region_code = '',
+                 region_name = '',
                  population = 0,
                  island_groups = '',
         **kw):
 
         self.id = id
-        self.name = name
+        self.region_code = region_code
+        self.region_name = region_name
         self.population = population
         self.island_groups = island_groups
 
@@ -25,7 +34,8 @@ class Regions(Base):
     def to_dict(self) -> dict:
         return dict(
             id = self.id,
-            name = self.name,
+            region_name = self.region_name,
+            region_code = self.region_code,
             population = self.population,
             island_groups = self.island_groups
         )

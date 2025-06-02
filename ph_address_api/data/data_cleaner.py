@@ -4,6 +4,9 @@ from sys import path
 import pandas as pd
 import os
 
+from rich import region
+
+
 def clean_data():
     #Read the data from Excel file.
     df = pd.read_excel('./PSGC-1Q-2025-Publication-Datafile.xlsx',
@@ -82,6 +85,7 @@ def clean_data():
 
     # Select data by its corresponding GEO Level and then save it to csv
     regions_groups = (df[df['geo_label'] == "Reg"])
+    regions_groups[['region_name', 'region_code']] = regions_groups['Name'].str.extract(r'^(.*?)\s*\((.*?)\)$')
 
     regions_groups.to_csv('./Regions.csv')
 

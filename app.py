@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 import uvicorn
+from ph_address_api.routes.address_route import address_router
 
 from ph_address_api.utils.app_utils import AppUtility
 
@@ -13,6 +14,8 @@ app = FastAPI(
     title='PH Address API',
     lifespan=AppUtility.app_life_span
 )
+
+app.include_router(address_router)
 
 
 if __name__ == '__main__':

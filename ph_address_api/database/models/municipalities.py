@@ -19,6 +19,8 @@ class Municipalities(Base):
     zip_code : str = Column('zip_code',String, nullable=True)
     population  : int = Column('population', Integer)
 
+
+
     def  __init__(self, id='', prov_id=None,city_id=None, name='', regions_id = None
                   ,zip_code ='',  population=0, **kw):
         self.id = id

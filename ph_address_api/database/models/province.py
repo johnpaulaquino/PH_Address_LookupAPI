@@ -1,6 +1,10 @@
 #import the base model
+from ph_address_api.database.models import City
+from ph_address_api.database.models import Municipalities
+from ph_address_api.database.models import Regions
 from ph_address_api.database.models.base import  Base
 from sqlalchemy import String, Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship, Mapped
 
 
 class Province(Base):
@@ -11,6 +15,9 @@ class Province(Base):
                        ForeignKey('regions.id', ondelete='cascade'))
     name : str = Column('name',String, index=True)
     population : int = Column('population', Integer)
+    region :  Mapped['Regions'] = relationship(back_populates='prov',lazy='dynamic')
+    city :  Mapped['City'] = relationship(back_populates='prov',lazy='dynamic')
+    muni :  Mapped['Municipalities'] = relationship(back_populates='prov',lazy='dynamic')
 
     def __init__(self, id='', region_id='', name='', population=0, **kw):
         self.id = id
@@ -18,5 +25,13 @@ class Province(Base):
         self.name = name
         self.population = population
         super().__init__(**kw)
+
+    def to_dict(self):
+        return dict(
+        id = self.id,
+        region_id = self.region_id ,
+        name=self.name,
+        population= self.population ,
+        )
 
 
