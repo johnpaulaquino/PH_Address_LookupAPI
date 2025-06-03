@@ -6,6 +6,8 @@ load_dotenv()
 class Settings(BaseSettings):
     DB_URL : str
     PORT : int
+    ENVIRONMENT : str = 'dev'
+
 
 
     class Config:
@@ -13,3 +15,4 @@ class Settings(BaseSettings):
             env_file='.env',
             env_file_encoding='utf-8'
         )
+

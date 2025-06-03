@@ -13,8 +13,7 @@ class Regions(Base):
     population : int = Column('population', Integer)
     island_groups: str = Column('island_groups', String, nullable=True)
 
-    prov  = relationship('Province', back_populates='region',lazy='dynamic')
-    cities  = relationship('City', back_populates='region',lazy='dynamic')
+
 
     def __init__(self, id = '',
                  region_code = '',

@@ -2,16 +2,26 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from contextlib import asynccontextmanager
 from sqlalchemy.orm import sessionmaker
 from ph_address_api.config.settings import Settings
-
+from pathlib import Path
 settings = Settings()
 
 '''
 @:var engine
     - This engine contains the url for db_services, to make a connection in db
 '''
-engine = create_async_engine(
+#from absolute path, then go down two directories to find the sql db
+sql_lite = Path(__file__).resolve().parent.parent.parent / 'dev.db'
+
+#if the environment is == dev, then the data will insert in sqlite, otherwise in real db.
+if settings.ENVIRONMENT == 'dev':
+    engine = create_async_engine(
+        f"sqlite+aiosqlite:///{sql_lite}",
+        connect_args={"check_same_thread": False}
+    )
+else:
+    engine = create_async_engine(
     settings.DB_URL
-)
+    )
 
 # Create a session factory
 LocalSession = sessionmaker(

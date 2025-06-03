@@ -4,7 +4,7 @@ import os
 from markdown_it.rules_block import table
 
 from ph_address_api.database.engine import create_session
-from sqlalchemy import select, and_, or_, join
+from sqlalchemy import select, and_, or_, join,outerjoin
 from sqlalchemy.orm import aliased
 from ph_address_api.database.models import *
 class AddressRepository:
@@ -174,15 +174,28 @@ class AddressRepository:
         """
         async with create_session() as db:
             try:
-                stmt = (select(Municipalities)
+                join_expr = (
+                    outerjoin(Municipalities,
+                              Province, Province.id == Municipalities.prov_id)
+                    .outerjoin(City, City.id == Municipalities.city_id)
+                    #this will fix, it didn't return the municipality by region.
+                    .outerjoin  (Regions, Regions.id == Municipalities.region_id)
+                )
+                stmt = (
+                    select(Municipalities)
                     .distinct()
-                    .join(Municipalities, Province.id == Municipalities.prov_id)
-                    .join(City, City.id == Municipalities.city_id)  # Join City explicitly
-                    .join(Regions, Regions.id == Municipalities.region_id)  # Join Regions explicitly
-                    .where(or_(Province.name == province_name ,
-                               City.name == province_name,
-                               Regions.region_code == province_name,
-                               Regions.region_name == province_name)))  # No need for or_ if one condition)
+                    .select_from(
+                        join_expr
+                    )
+                    .where(
+                        or_(
+                            Province.name == province_name,
+                            City.name == province_name,
+                            Regions.region_code == province_name,
+                            Regions.region_name == province_name,
+                        )
+                    )
+                )# No need for or_ if one condition)
                 result = await db.execute(stmt)
                 data = result.scalars().all()
                 if not data:
@@ -191,22 +204,3 @@ class AddressRepository:
             except Exception as e:
                 raise e
 
-    @staticmethod
-    async def get_submuni_by_cities(city_name):
-        """
-        :param city_name: that will use to find the cities.
-        :return: cities that are found.
-        """
-        async with create_session() as db:
-            try:
-                stmt = (select(Municipalities)
-                        .select_from(City)
-                        .outerjoin(Municipalities, City.id == Municipalities.city_id)
-                        .where(or_(City.name == city_name)))
-                result = await db.execute(stmt)
-                data = result.scalars().all()
-                if not data:
-                    return []
-                return data
-            except Exception as e:
-                raise e
