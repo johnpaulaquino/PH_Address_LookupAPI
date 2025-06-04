@@ -175,13 +175,17 @@ class AddressServices:
                             name=name,
                             population=population)
 
+
                     #for Lone municipalities
                     if fk_id in region_ids:
                         municipality = Municipalities(
                             id=id,
-                            regions_id=fk_id,
+                            region_id=fk_id,
                             name=name,
                             population=population)
+
+
+
 
                     # if not exist, then append in batch list.
                     is_exist = await AddressRepository.find_name_by_id(Municipalities,
@@ -189,6 +193,7 @@ class AddressServices:
                                                                        municipality.name)
                     if not is_exist:
                         # Append the data in batch
+
                         batch.append(municipality)
                     # insert by batch if the length of the batch is
                     # greater than or equal to the batch size.
@@ -256,7 +261,7 @@ class AddressServices:
 
     #get the data from region
     @staticmethod
-    async def get_provinces_by_region(region_name):
+    async def get_provinces(region_name):
         """
 
         :param region_name: the name of the region.
@@ -264,20 +269,14 @@ class AddressServices:
         """
         try:
             # check if the user inputted region is matched in data in db.
-            data = await AddressRepository.get_regions_by_name_code(region_name)
+            data = await AddressRepository.get_provinces_cities(region_name)
             #check if data is null, then raise an error, with a status of 404.
             if not data:
                 raise HTTPException(
                     detail="Region not found!",
                     status_code= status.HTTP_404_NOT_FOUND
                 )
-            #otherwise return the provinces data.
-            data = await AddressRepository.get_provinces_by_region(region_name)
-            provinces = []
-
-            for row in data:
-                if row:
-                    provinces.append(row.name)
+            provinces = data.to_dict()['provinces']
 
             if not provinces:
                 return JSONResponse(
@@ -288,7 +287,7 @@ class AddressServices:
             return JSONResponse(
                 content={'status': 'ok',
                          'message': 'Successfully retrieved!',
-                         'provinces': provinces},
+                         'provinces':provinces},
                 status_code=status.HTTP_200_OK
             )
 
@@ -296,66 +295,75 @@ class AddressServices:
             raise e
 
     @staticmethod
-    async def get_cities_by_region(region_name : str):
+    async def get_cities(region_name : str):
         """
-        To retrieve the cities that are associated in regions
-        :param region_name: that will use to find the cities that are associated.
-        :return: JSON Response
+               :param region_name: the name of the region.
+               :return: data provinces that are associated in the region entered by the user.
         """
         try:
-            data = await AddressRepository.get_cities_by_region(region_name)
+            # check if the user inputted region is matched in data in db.
+            data = await AddressRepository.get_provinces_cities(region_name)
+            # check if data is null, then raise an error, with a status of 404.
+
             if not data:
                 raise HTTPException(
-                    detail='No Region found!',
+                    detail="Region not found!",
                     status_code=status.HTTP_404_NOT_FOUND
                 )
-            cities_name = []
-            for val in data:
-                if val is not None:
-                    cities_name.append(val.name)
+            cities = data.to_dict()['city']
 
-            if not cities_name:
-                raise HTTPException(
-                    detail= 'No cities found!',
-                    status_code= status.HTTP_404_NOT_FOUND
+            if not cities:
+                return JSONResponse(
+                    content={"message": 'No Cities found!'},
+                    status_code=status.HTTP_404_NOT_FOUND
                 )
 
             return JSONResponse(
                 content={'status': 'ok',
                          'message': 'Successfully retrieved!',
-                         'cities' : cities_name},
-                status_code= status.HTTP_200_OK
+                         'cities': cities},
+                status_code=status.HTTP_200_OK
             )
+
         except Exception as e:
             raise e
 
     @staticmethod
-    async def get_municipalities(address_name: str):
+    async def get_muncipalities(region_name: str):
         """
-        To retrieve the municipalities that are associated in Province.
-        :param address_name: that will use to find the cities that are associated.
-        :return: JSON Response
+               :param region_name: the name of the region.
+               :return: data provinces that are associated in the region entered by the user.
         """
         try:
-            by_prove_data = await AddressRepository.get_muni_by_province(address_name)
-            # by_cities_data = await AddressRepository.get_submuni_by_cities(address_name)
-            muni_name = []
-            # submuni_name = []
-            if by_prove_data is not None:
-                for val in by_prove_data:
-                    muni_name.append(val.name)
+            # check if the user inputted region is matched in data in db.
+            data_cities = await AddressRepository.get_municipalities(region_name, Province)
+            data_prov = await AddressRepository.get_municipalities(region_name, City)
+            data_region = await AddressRepository.get_municipalities(region_name, Regions)
 
-            if not muni_name:
+            # check if data is null, then raise an error, with a status of 404.
+
+            if not data_cities and data_prov and data_region:
                 raise HTTPException(
-                        detail='No Address found!',
-                        status_code=status.HTTP_404_NOT_FOUND
+                    detail="Region not found!",
+                    status_code=status.HTTP_404_NOT_FOUND
                 )
+            # cities = data_cities[0].to_dict()['city']
+            # provinces = data_cities[0].to_dict()['provinces']
+            # regions = data_cities[0].to_dict()['region']
+            #
+            # if cities:
+            #     data = cities
+            # elif provinces:
+            #     data = provinces
+            # else:
+            #     data = regions
 
             return JSONResponse(
                 content={'status': 'ok',
                          'message': 'Successfully retrieved!',
-                         'municipalities': muni_name},
+                         'municipalities': data_prov},
                 status_code=status.HTTP_200_OK
             )
+
         except Exception as e:
             raise e

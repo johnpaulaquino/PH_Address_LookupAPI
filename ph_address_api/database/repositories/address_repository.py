@@ -2,10 +2,11 @@
 import os
 
 from markdown_it.rules_block import table
+from sqlalchemy import func
 
 from ph_address_api.database.engine import create_session
 from sqlalchemy import select, and_, or_, join,outerjoin
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, joinedload, selectinload
 from ph_address_api.database.models import *
 class AddressRepository:
 
@@ -47,7 +48,7 @@ class AddressRepository:
                 )
                 ))
                 result = await db.execute(stmt)
-                data = result.scalars().all()
+                data = result.scalars().unique().all()
                 if not data:
                     return False
                 return True
@@ -74,7 +75,7 @@ class AddressRepository:
                 )
                 ))
                 result = await db.execute(stmt)
-                data = result.scalars().all()
+                data = result.scalars().unique().all()
                 if not data:
                     return False
                 return True
@@ -101,106 +102,26 @@ class AddressRepository:
             return None
 
     @staticmethod
-    async def get_regions_by_name_code(address_name : str):
-        """
-
-        :param address_name: name of the address. ex: NCR or National Capitol Region
-        :return:
-        """
-        try:
-            async with create_session() as db:
-                stmt = select(Regions).where(
-                   or_(
-                       Regions.region_name == address_name,
-                       Regions.region_code == address_name
-                   )
-                )
-                result = await db.execute(stmt)
-                data = result.scalars().one()
-                #if no found data, return False, otherwise return true.
-                if not data:
-                    return False
-                return True
-        except Exception as e:
-            print(f'An error occurred: {e}')
-            return False
-
-    @staticmethod
-    async  def get_provinces_by_region(region_name):
+    async  def get_provinces_cities(region_name):
         async with create_session() as db:
             try:
-                stmt = (select(Province)
-                .select_from(Regions)
-                .outerjoin( Province, Regions.id == Province.region_id)
-                .where(or_(Regions.region_name == region_name,
-                Regions.region_code == region_name)))
+                stmt = (select(Regions).options(selectinload(Regions.muni))
+                .where(
+                    or_( Regions.region_code.ilike(region_name),
+                         Regions.region_name.ilike(region_name))
 
+                ))
                 result = await db.execute(stmt)
-                data = result.scalars().all()
-
+                data = result.unique().scalar_one_or_none()
                 return data
-
             except Exception as e:
                 raise e
 
     @staticmethod
-    async def get_cities_by_region(region_name):
-        """
-
-        :param region_name: that will use to find the cities.
-        :return: cities that are found.
-        """
+    async def get_municipalities(address_name, Table):
         async with create_session() as db:
             try:
-                stmt = (select(City)
-                        .select_from(Regions)
-                        .outerjoin(City, Regions.id == City.region_id)
-                        .where(or_(Regions.region_name == region_name,
-                                   Regions.region_code == region_name)))
-                result = await db.execute(stmt)
-                data = result.scalars().all()
-                if not data:
-                    return []
-                return data
-
-            except Exception as e:
-                raise e
-
-    @staticmethod
-    async def get_muni_by_province(province_name):
-        """
-        :param province_name: that will use to find the cities.
-        :return: cities that are found.
-        """
-        async with create_session() as db:
-            try:
-                join_expr = (
-                    outerjoin(Municipalities,
-                              Province, Province.id == Municipalities.prov_id)
-                    .outerjoin(City, City.id == Municipalities.city_id)
-                    #this will fix, it didn't return the municipality by region.
-                    .outerjoin  (Regions, Regions.id == Municipalities.region_id)
-                )
-                stmt = (
-                    select(Municipalities)
-                    .distinct()
-                    .select_from(
-                        join_expr
-                    )
-                    .where(
-                        or_(
-                            Province.name == province_name,
-                            City.name == province_name,
-                            Regions.region_code == province_name,
-                            Regions.region_name == province_name,
-                        )
-                    )
-                )# No need for or_ if one condition)
-                result = await db.execute(stmt)
-                data = result.scalars().all()
-                if not data:
-                    return []
-                return data
+                pass
             except Exception as e:
                 raise e
 

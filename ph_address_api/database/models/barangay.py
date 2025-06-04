@@ -1,5 +1,6 @@
 from sqlalchemy import  Column, String, ForeignKey, Integer
 from ph_address_api.database.models.base import Base
+from sqlalchemy.orm import relationship
 
 class Barangay(Base):
     __tablename__ = 'barangay'
@@ -13,6 +14,7 @@ class Barangay(Base):
                                      ondelete='cascade'), nullable=True)
     name: str = Column('name', String, index=True)
     population  : int = Column('population', Integer)
+
 
     def __init__(self, id = '', city_id = None,
                  municipalities_id =None, name= '',

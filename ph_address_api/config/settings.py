@@ -6,7 +6,7 @@ load_dotenv()
 class Settings(BaseSettings):
     DB_URL : str
     PORT : int
-    ENVIRONMENT : str = 'dev'
+    ENVIRONMENT : str = 'prod'
 
 
 

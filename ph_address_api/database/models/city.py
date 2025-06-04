@@ -14,7 +14,8 @@ class City(Base):
     zip_code : str = Column('zip_code',String, nullable=True)
     population  : int = Column('population', Integer)
 
-
+    region = relationship('Regions', back_populates='city', lazy='selectin')
+    muni = relationship('Municipalities', back_populates='city', lazy='selectin')
 
     def  __init__(self, id='', prov_id=None,region_id = None, name='',zip_code ='',  population=0, **kw):
         self.id = id
@@ -25,3 +26,12 @@ class City(Base):
         self.zip_code = zip_code
 
         super().__init__(**kw)
+
+    def to_dict(self):
+        return dict(
+            id = self.id,
+            name = self.name,
+            population = self.population,
+            zip_code = self.zip_code,
+            muni  = list(sorted(map(lambda x: x.name, self.muni))),
+        )

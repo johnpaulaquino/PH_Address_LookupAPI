@@ -13,7 +13,9 @@ class Regions(Base):
     population : int = Column('population', Integer)
     island_groups: str = Column('island_groups', String, nullable=True)
 
-
+    prov = relationship('Province', back_populates='region', lazy='selectin')
+    city = relationship('City', back_populates='region', lazy='selectin')
+    muni = relationship('Municipalities', lazy='selectin')
 
     def __init__(self, id = '',
                  region_code = '',
@@ -36,7 +38,10 @@ class Regions(Base):
             region_name = self.region_name,
             region_code = self.region_code,
             population = self.population,
-            island_groups = self.island_groups
+            island_groups = self.island_groups,
+            provinces = [prov.name for prov in self.prov],
+            city = [city.name for city in self.city],
+            muni = [mun.name for mun in self.muni]
         )
 
 

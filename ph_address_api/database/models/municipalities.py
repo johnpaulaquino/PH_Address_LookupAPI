@@ -1,4 +1,6 @@
 from sqlalchemy import  Column, String, ForeignKey, Integer
+from sqlalchemy.orm import relationship
+
 from ph_address_api.database.models.base import Base
 
 class Municipalities(Base):
@@ -19,16 +21,26 @@ class Municipalities(Base):
     zip_code : str = Column('zip_code',String, nullable=True)
     population  : int = Column('population', Integer)
 
+    prov = relationship('Province', back_populates='muni', lazy='selectin')
+    city = relationship('City', back_populates='muni', lazy='selectin')
+    region = relationship('Regions', back_populates='muni', lazy='selectin')
 
-
-    def  __init__(self, id='', prov_id=None,city_id=None, name='', regions_id = None
+    def  __init__(self, id='', prov_id=None,city_id=None, name='', region_id = None
                   ,zip_code ='',  population=0, **kw):
         self.id = id
         self.prov_id = prov_id
         self.city_id = city_id
-        self.regions_id = regions_id
+        self.region_id = region_id
         self.name = name
         self.population = population
         self.zip_code = zip_code
 
         super().__init__(**kw)
+
+    def to_dict(self):
+        return dict(
+            id = self.id,
+            name = self.name,
+            population = self.population,
+            zip_code = self.zip_code,
+        )
