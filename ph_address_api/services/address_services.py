@@ -1,7 +1,5 @@
-from pyexpat.errors import messages
 
 from fastapi import HTTPException, status
-from jinja2.nodes import Add
 from starlette.responses import JSONResponse
 
 from ph_address_api.database.models import *
@@ -13,25 +11,36 @@ class AddressServices:
 
     @staticmethod
     async def batch_insert_regions(file_path: str, batch_size: int = 1000) -> bool:
+        """
+        Batch insertion in region table in database.
+        :param file_path:
+            The location of the file.
+        :param batch_size:
+            The specified number of data in batch to be inserted in database.
+        :return:
+            True, if successfully, otherwise False.
+        """
         try:
             batch = []
             # check the file if it is not scv file, then raise an Exception.
             if not file_path.lower().endswith('.csv'):
                 raise Exception('Invalid filetype. Must be a csv file!')
 
-            # then convert the csv into dict
+            # Read the file and then convert into dictionary using the DictReader object.
             with (open(file_path, 'r') as file):
                 reader = DictReader(file)
 
+                #loop though the value in dictionary
                 for val in reader:
                     region =  Regions(
                             id = str(val['id']),
-                            region_code= str(val['region_code']),
-                            region_name= str(val['region_name']),
+                            region_code= str(val['region_code'].strip()),
+                            region_name= str(val['region_name'].strip()),
                             population= int(val['population'])
                         )
+                    #check if the regions is exist, if yes then ignore it, other wise add.
                     is_exist = await AddressRepository \
-                    .find_name_by_id_in_reginos(
+                    .find_name_by_id_in_regions(
                     region.id,
                     region_name= region.region_name,
                     region_code= region.region_code)
@@ -53,7 +62,17 @@ class AddressServices:
 
     @staticmethod
     async def batch_insert_province_huc(file_path: str, batch_size: int = 1000) -> bool:
+        """
+        Batch insertion in province table in database.
+        :param file_path:
+            The location of the file.
+        :param batch_size:
+            The specified number of data in batch to be inserted in database.
+        :return:
+            True, if successfully, otherwise False.
+        """
         try:
+
             batch = []
             # check the file if it is not scv file, then raise an Exception.
             if not file_path.lower().endswith('.csv'):
@@ -63,6 +82,7 @@ class AddressServices:
             with (open(file_path, 'r') as file):
                 reader = DictReader(file)
 
+                #Loop through the data in dictionary.
                 for val in reader:
                     province = Province(
                         id=str(val['id']),
@@ -106,7 +126,7 @@ class AddressServices:
                 for val in reader:
                     id = str(val['id'])
                     fk_id = str(val['sub_id'])
-                    name = str(val['Name'])
+                    name = str(val['Name'].strip())
                     population = int(val['population'])
 
 
@@ -159,7 +179,7 @@ class AddressServices:
                 for val in reader:
                     id = str(val['id'])
                     fk_id = str(val['sub_id'])
-                    name = str(val['Name'])
+                    name = str(val['Name'].strip())
                     population = int(val['population'])
 
                     if fk_id in city_ids:
@@ -183,9 +203,6 @@ class AddressServices:
                             region_id=fk_id,
                             name=name,
                             population=population)
-
-
-
 
                     # if not exist, then append in batch list.
                     is_exist = await AddressRepository.find_name_by_id(Municipalities,
@@ -223,7 +240,7 @@ class AddressServices:
                 for val in reader:
                     id = str(val['id'])
                     fk_id = str(val['sub_id'])
-                    name = str(val['Name'])
+                    name = str(val['Name'].strip())
                     population = val['population']
 
                     if fk_id in city_ids:
@@ -258,12 +275,11 @@ class AddressServices:
         except Exception as e:
             raise e
 
-
     #get the data from region
     @staticmethod
     async def get_provinces(region_name):
         """
-
+        get province names that are associated in the region.
         :param region_name: the name of the region.
         :return: data provinces that are associated in the region entered by the user.
         """
@@ -284,6 +300,7 @@ class AddressServices:
                     status_code=status.HTTP_404_NOT_FOUND
                 )
 
+            # return json response
             return JSONResponse(
                 content={'status': 'ok',
                          'message': 'Successfully retrieved!',
@@ -329,41 +346,81 @@ class AddressServices:
             raise e
 
     @staticmethod
-    async def get_muncipalities(region_name: str):
+    async def get_muncipalities(address_name: str):
         """
-               :param region_name: the name of the region.
-               :return: data provinces that are associated in the region entered by the user.
+        Get the municipalities that are associated in region or city or province.
+        :param address_name: is the user inputted, which can be a region or city or province
+        :return: the data which contains the municipalities name
         """
+
         try:
             # check if the user inputted region is matched in data in db.
-            data_cities = await AddressRepository.get_municipalities(region_name, Province)
-            data_prov = await AddressRepository.get_municipalities(region_name, City)
-            data_region = await AddressRepository.get_municipalities(region_name, Regions)
+            data = await AddressRepository.get_municipalities(address_name)
 
             # check if data is null, then raise an error, with a status of 404.
 
-            if not data_cities and data_prov and data_region:
+            if not data:
                 raise HTTPException(
-                    detail="Region not found!",
+                    detail="address not found!",
                     status_code=status.HTTP_404_NOT_FOUND
                 )
-            # cities = data_cities[0].to_dict()['city']
-            # provinces = data_cities[0].to_dict()['provinces']
-            # regions = data_cities[0].to_dict()['region']
-            #
-            # if cities:
-            #     data = cities
-            # elif provinces:
-            #     data = provinces
-            # else:
-            #     data = regions
+            #list of all names in municipalities
+            data = list(sorted(map(lambda x : x.name, data)))
 
             return JSONResponse(
                 content={'status': 'ok',
                          'message': 'Successfully retrieved!',
-                         'municipalities': data_prov},
+                         'municipalities': data},
                 status_code=status.HTTP_200_OK
             )
 
         except Exception as e:
+            raise e
+
+    @staticmethod
+    async def get_barangays(address_name : str, municipalites_name : str):
+        """
+       To get all barangay that are associated in the municipalities and its parent.
+       :param address_name: is the user input, which can be a municipalities or cities 
+       which depends on their parent.
+       :param municipalites_name: is the user input, which is the municipalities.
+       :return: 
+        """
+        try:
+            # check if the user inputted region is matched in data in db.
+            province_table = await AddressRepository.get_barangay_in_muni(address_name,
+                                                                          municipalites_name,
+                                                                          Province)
+            city_table = await AddressRepository.get_barangay_in_muni(address_name,
+                                                                      municipalites_name, City)
+            region_table = await AddressRepository.get_barangay_in_muni(address_name,
+                                                                        municipalites_name, Regions)
+
+            # check if data is null, then raise an error, with a status of 404.
+
+            if not province_table and not city_table and not region_table:
+                raise HTTPException(
+                    detail="address not found!",
+                    status_code=status.HTTP_404_NOT_FOUND
+                )
+
+            # check what table is, then it will get that names of the barangay and store in list.
+            if province_table:
+
+                data = list(sorted(map(lambda x: x.name, province_table)))
+            elif city_table:
+
+                data = list(sorted(map(lambda x: x.name, city_table)))
+            else:
+                data = list(sorted(map(lambda x: x.name, region_table)))
+
+            # Then return a Json Response
+            return JSONResponse(
+                content={'status': 'ok',
+                         'message': 'Successfully retrieved!',
+                         'barangays': data},
+                status_code=status.HTTP_200_OK
+            )
+        except Exception as e:
+            print(f"An error occurred: {e}")
             raise e

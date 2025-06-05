@@ -13,8 +13,7 @@ class Province(Base):
     name : str = Column('name',String, index=True)
     population : int = Column('population', Integer)
 
-    region = relationship('Regions', back_populates='prov', lazy='joined')
-    muni = relationship('Municipalities', back_populates='prov',lazy='joined')
+    region = relationship('Regions', back_populates='prov', lazy='selectin')
 
     def __init__(self, id='', region_id='', name='', population=0, **kw):
         self.id = id

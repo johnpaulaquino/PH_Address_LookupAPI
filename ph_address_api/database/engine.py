@@ -19,6 +19,7 @@ if settings.ENVIRONMENT == 'dev':
         connect_args={"check_same_thread": False}
     )
 else:
+
     engine = create_async_engine(
     settings.DB_URL
     )

@@ -15,8 +15,6 @@ class Regions(Base):
 
     prov = relationship('Province', back_populates='region', lazy='selectin')
     city = relationship('City', back_populates='region', lazy='selectin')
-    muni = relationship('Municipalities', lazy='selectin')
-
     def __init__(self, id = '',
                  region_code = '',
                  region_name = '',
@@ -41,7 +39,6 @@ class Regions(Base):
             island_groups = self.island_groups,
             provinces = [prov.name for prov in self.prov],
             city = [city.name for city in self.city],
-            muni = [mun.name for mun in self.muni]
         )
 
 

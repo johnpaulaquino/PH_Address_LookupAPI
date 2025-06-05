@@ -21,10 +21,6 @@ class Municipalities(Base):
     zip_code : str = Column('zip_code',String, nullable=True)
     population  : int = Column('population', Integer)
 
-    prov = relationship('Province', back_populates='muni', lazy='selectin')
-    city = relationship('City', back_populates='muni', lazy='selectin')
-    region = relationship('Regions', back_populates='muni', lazy='selectin')
-
     def  __init__(self, id='', prov_id=None,city_id=None, name='', region_id = None
                   ,zip_code ='',  population=0, **kw):
         self.id = id

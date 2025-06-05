@@ -3,6 +3,10 @@ import asyncio
 from ph_address_api.services.address_services import AddressServices
 
 try:
+    """
+    This file is for inserting a data in database by calling the functions that 
+    I created in the services folder.
+    """
     regions_path = 'Regions.csv'
     province_path = 'Province.csv'
     cities = 'Cities.csv'

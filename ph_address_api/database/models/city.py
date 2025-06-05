@@ -8,15 +8,17 @@ class City(Base):
     __tablename__ = 'city'
 
     id : str = Column('id', String, primary_key=True, index=True)
-    prov_id : str = Column('prov_id', String,ForeignKey('province.id'), nullable=True)
-    region_id : str = Column('region_id', String,ForeignKey('regions.id'), nullable=True)
+    prov_id : str = Column('prov_id', String,
+                           ForeignKey('province.id' ,ondelete='Cascade'),
+                           nullable=True)
+    region_id : str = Column('region_id', String,
+                             ForeignKey('regions.id',ondelete='Cascade'),
+                             nullable=True)
     name : str = Column('name', String, index=True)
     zip_code : str = Column('zip_code',String, nullable=True)
     population  : int = Column('population', Integer)
 
     region = relationship('Regions', back_populates='city', lazy='selectin')
-    muni = relationship('Municipalities', back_populates='city', lazy='selectin')
-
     def  __init__(self, id='', prov_id=None,region_id = None, name='',zip_code ='',  population=0, **kw):
         self.id = id
         self.prov_id = prov_id
@@ -33,5 +35,4 @@ class City(Base):
             name = self.name,
             population = self.population,
             zip_code = self.zip_code,
-            muni  = list(sorted(map(lambda x: x.name, self.muni))),
         )

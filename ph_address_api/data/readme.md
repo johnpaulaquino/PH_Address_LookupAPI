@@ -5,9 +5,9 @@
 
 
 **data_cleaner**
-1. [ ] Clean the raw data.
-2. [ ] Make a foreign key based on their parent.
-3. [ ] Make a separated csv files for different addresses.
+1. [X] Clean the raw data.
+2. [X] Make a foreign key based on their parent.
+3. [X] Make a separated csv files for different addresses.
 
 **data_to_db**
 1. Insert the data in db based on the addresses.

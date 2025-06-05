@@ -1,6 +1,5 @@
 from sqlalchemy import  Column, String, ForeignKey, Integer
 from ph_address_api.database.models.base import Base
-from sqlalchemy.orm import relationship
 
 class Barangay(Base):
     __tablename__ = 'barangay'
