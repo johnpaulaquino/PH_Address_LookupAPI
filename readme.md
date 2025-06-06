@@ -9,6 +9,24 @@ it should input the parent of the municipalities, the Laguna.
 
 ## ⏺️ Live Server
 You can test the API Here -> [Swagger UI](https://ph-address-lookupapi.onrender.com/docs#/)
+## 📍 Endpoints
+
+##### 1. This will return all regions
+
+    https://ph-address-lookupapi.onrender.com/v1/api/get-regions
+
+##### 2. This will return all provinces based on the region.
+    https://ph-address-lookupapi.onrender.com/v1/api/get-province?region=replace me
+
+##### 3. This will return all cities based on region.
+    https://ph-address-lookupapi.onrender.com/v1/api/get-cities?region=ncr
+
+##### 4. This will return all municiaplaities based on the provicne or region or cities.
+    https://ph-address-lookupapi.onrender.com/v1/api/get-municipalities?province=replace me
+
+##### 5. This will return all barangays based on municipalities and its parent.
+    https://ph-address-lookupapi.onrender.com/v1/api/get-barangays?address_name=replace me&municipalities=replace me
+
 
 
 ## 📑 Essential Features
