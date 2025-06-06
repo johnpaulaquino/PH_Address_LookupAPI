@@ -11,7 +11,7 @@ but I will add it once I got data.
 '''
 app = FastAPI(
     description=description,
-    title='PH Address API',
+    title='📍 PH Address LookUp API',
     lifespan=AppUtility.app_life_span
 )
 

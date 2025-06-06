@@ -34,6 +34,7 @@ class AddressServices:
                 for val in reader:
                     region =  Regions(
                             id = str(val['id']),
+                            name=str(val['Name'].strip()),
                             region_code= str(val['region_code'].strip()),
                             region_name= str(val['region_name'].strip()),
                             population= int(val['population'])
@@ -275,7 +276,29 @@ class AddressServices:
         except Exception as e:
             raise e
 
-    #get the data from region
+    @staticmethod
+    async def get_regions():
+        try:
+            data = await AddressRepository.get_all_regions()
+            if not data:
+                raise HTTPException(
+                    detail = 'No Regions found!',
+                    status_code= status.HTTP_404_NOT_FOUND
+                )
+
+            regions = [dat.name  for dat in data]
+
+            return JSONResponse(
+                content={'status': 'ok',
+                         'message': 'Successfully retrieved!',
+                         'regions': regions},
+                status_code=status.HTTP_200_OK
+            )
+
+
+        except Exception as e:
+            print(f'An error occurred: {e}')
+
     @staticmethod
     async def get_provinces(region_name):
         """

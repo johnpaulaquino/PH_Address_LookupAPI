@@ -9,6 +9,14 @@ address_router = APIRouter(
   tags=['Address']
 )
 
+@address_router.get('/get-regions')
+async def get_province():
+
+    try:
+        return await AddressServices.get_regions()
+    except Exception as e:
+        print(f'An error occurred: {e}')
+        raise e
 
 @address_router.get('/get-province')
 async def get_province(region : str):

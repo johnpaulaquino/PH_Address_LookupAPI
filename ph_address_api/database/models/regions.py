@@ -8,6 +8,7 @@ class Regions(Base):
     __tablename__  = 'regions'
 
     id : str = Column('id', String, primary_key=True, index=True)
+    name : str = Column('name', String, nullable=True, index=True)
     region_name : str = Column('region_name',String, nullable=True, index=True)
     region_code : str = Column('region_code',String, nullable=True, index=True)
     population : int = Column('population', Integer)
@@ -16,6 +17,7 @@ class Regions(Base):
     prov = relationship('Province', back_populates='region', lazy='selectin')
     city = relationship('City', back_populates='region', lazy='selectin')
     def __init__(self, id = '',
+                 name = '',
                  region_code = '',
                  region_name = '',
                  population = 0,
@@ -23,6 +25,7 @@ class Regions(Base):
         **kw):
 
         self.id = id
+        self.name = name
         self.region_code = region_code
         self.region_name = region_name
         self.population = population

@@ -105,6 +105,20 @@ class AddressRepository:
             return None
 
     @staticmethod
+    async def get_all_regions():
+
+        """
+        Return all the regions.
+        :return: the regions.
+        """
+        async with create_session() as db:
+            try:
+                result = await db.execute(select(Regions))
+                data = result.scalars().unique().all()
+                return data
+            except Exception as e:
+                raise e
+    @staticmethod
     async  def get_provinces_cities(region_name):
         """
         Get provinces names, by inputted region.
