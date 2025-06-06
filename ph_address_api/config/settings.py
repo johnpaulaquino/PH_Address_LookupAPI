@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     PORT : int
     #In normal this is dev, it means the db used is the sql lite,
     # otherwise store in the specific database, such us the online db or other platforms.
-    ENVIRONMENT : str = 'prod'
+    ENVIRONMENT : str = 'dev'
 
     #Configuration of the settings
     class Config:

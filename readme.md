@@ -7,8 +7,9 @@ that, there is a parent of barangay, which municipalities, and also
 it should input the parent of the municipalities, the Laguna.
 
 
+
 ## ⏺️ Demo
-Link for demo. but as of now, I have no video
+Link for demo, but as of now, I have no video.
 
 
 ## 📑 Essential Features
@@ -25,6 +26,9 @@ Link for demo. but as of now, I have no video
 
 ## ➕ Additional Features
 1. [x] Will add soon
+
+
+        
 
 
 ## 📁 Project Structure
@@ -56,12 +60,10 @@ Link for demo. but as of now, I have no video
 ##### 3. Install Required Packages
     pip install -r requiremtents
 
+##### 4. if you don't want to use software for database, then you can simply change the value in ENVIRONMENT to **'dev'** that can be found in config -> settings. Then run this in you terminal command:
+    alembic init -t async migration
 ##### 4. Simply Go to app.py and then run or simply type this in command:
     python app.py
-
-## 📦 Usage
-* Open the browser and navigate to the link that are in the terminal after you run the app.py
-* Add **/docs** in last part of the endpoint, to access the swagger UI.
 
 ## 🔐 Environment
 
@@ -76,3 +78,10 @@ Link for demo. but as of now, I have no video
 
 🔗 [My LinkedIn Profile](https://www.linkedin.com/in/aquino-john-paul-b1a708356)
  
+☎️ **09858204458**
+
+
+##### NOTE:
+
+That the data I used in this project is came from :
+[PSGC Website](https://psa.gov.ph/classification/psgc)

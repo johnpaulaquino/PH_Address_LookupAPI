@@ -16,7 +16,7 @@ try:
     # asyncio.run(AddressServices.batch_insert_province_huc(province_path))
     # asyncio.run(AddressServices.batch_insert_cities(cities))
     # asyncio.run(AddressServices.batch_insert_municipalities(muni_path))
-    # asyncio.run(AddressServices.batch_insert_brgy(brgy_path))
+    asyncio.run(AddressServices.batch_insert_brgy(brgy_path))
 
 except Exception as e:
     print(e)
