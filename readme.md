@@ -74,5 +74,5 @@ Link for demo. but as of now, I have no video
 ## 📞 Contacts
 **✉️ johnpaul.dev72@gmail.com**
 
-🔗 [Linked Profile](www.linkedin.com/in/aquino-john-paul-b1a708356)
+🔗 [My LinkedIn Profile](https://www.linkedin.com/in/aquino-john-paul-b1a708356)
  
