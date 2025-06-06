@@ -7,9 +7,8 @@ that, there is a parent of barangay, which municipalities, and also
 it should input the parent of the municipalities, the Laguna.
 
 
-
-## ⏺️ Demo
-Link for demo, but as of now, I have no video.
+## ⏺️ Live Server
+You can test the API Here -> [Swagger UI](https://ph-address-lookupapi.onrender.com/docs#/)
 
 
 ## 📑 Essential Features
